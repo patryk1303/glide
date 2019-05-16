@@ -11,6 +11,7 @@ var defaults = {
    * Available types:
    * `slider` - Rewinds slider to the start/end when it reaches the first or last slide.
    * `carousel` - Changes slides without starting over when it reaches the first or last slide.
+   * `slideshow` - Changes slides with a fade effect.
    *
    * @type {String}
    */
@@ -198,6 +199,7 @@ var defaults = {
     },
     slider: 'glide--slider',
     carousel: 'glide--carousel',
+    slideshow: 'glide--slideshow',
     swipeable: 'glide--swipeable',
     dragging: 'glide--dragging',
     cloneSlide: 'glide__slide--clone',
@@ -1640,8 +1642,10 @@ function Sizes (Glide, Components, Events) {
    * - on updating via API, to calculate dimensions based on new options
    */
   Events.on(['build.before', 'resize', 'update'], function () {
-    Sizes.setupSlides();
-    Sizes.setupWrapper();
+    if (!Glide.isType('slideshow')) {
+      Sizes.setupSlides();
+      Sizes.setupWrapper();
+    }
   });
 
   /**
@@ -2338,6 +2342,10 @@ function Translate (Glide, Components, Events) {
    * - on updating via API to reflect possible changes in options
    */
   Events.on('move', function (context) {
+    if (Glide.isType('slideshow')) {
+      return;
+    }
+
     var gap = Components.Gaps.value;
     var length = Components.Sizes.length;
     var width = Components.Sizes.slideWidth;
@@ -2447,7 +2455,9 @@ function Transition (Glide, Components, Events) {
     enable: function enable() {
       disabled = false;
 
-      this.set();
+      if (!Glide.isType('slideshow')) {
+        this.set();
+      }
     },
 
 
@@ -2459,7 +2469,9 @@ function Transition (Glide, Components, Events) {
     disable: function disable() {
       disabled = true;
 
-      this.set();
+      if (!Glide.isType('slideshow')) {
+        this.set();
+      }
     }
   };
 
@@ -2486,7 +2498,9 @@ function Transition (Glide, Components, Events) {
    * - on each moving, because it may be cleared by offset move
    */
   Events.on('move', function () {
-    Transition.set();
+    if (!Glide.isType('slideshow')) {
+      Transition.set();
+    }
   });
 
   /**
